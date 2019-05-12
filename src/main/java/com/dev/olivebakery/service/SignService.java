@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -92,8 +94,8 @@ public class SignService implements UserDetailsService {
                 .orElseThrow(() -> new UserDefineException("해당 유저가 존재하지 않습니다."));
     }
 
-    public SignDto.MemberDto getMemberInfo(SignDto.SignIn signInDto) {
-        Member member = memberRepository.findByEmail(signInDto.getId())
+    public SignDto.MemberDto getMemberInfo(String userId) {
+        Member member = memberRepository.findByEmail(userId)
                 .orElseThrow(() -> new UserDefineException("아이디가 존재하지 않습니다."));
         return SignDto.MemberDto.builder()
                 .email(member.getEmail())
@@ -102,5 +104,21 @@ public class SignService implements UserDetailsService {
                 .stamp(member.getStamp())
                 .build();
 
+    }
+
+    public List<SignDto.MemberDto> getMembersInfo() {
+        List<Member> members = memberRepository.findAll();
+        List<SignDto.MemberDto> memberDtos = new ArrayList<>();
+        members.forEach(member -> {
+            memberDtos.add(
+                    SignDto.MemberDto.builder()
+                            .email(member.getEmail())
+                            .name(member.getName())
+                            .phoneNumber(member.getPhoneNumber())
+                            .stamp(member.getStamp())
+                            .build()
+            );
+        });
+        return memberDtos;
     }
 }

@@ -1,4 +1,10 @@
 spring:
+  profiles:
+    active: local
+
+
+spring:
+  profiles: local
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,7 +18,6 @@ spring:
     url: jdbc:mysql://chunsodb.c04b2rx0gbkh.ap-northeast-2.rds.amazonaws.com:3306/olive_bakery?useSSL=false&serverTimezone=Asia/Seoul
     username: chunso
     password: alswjd96
-
   servlet:
     multipart:
       max-file-size: 1MB
@@ -36,9 +41,3 @@ logging:
 
 server:
   port: 8080
-
-
-
-
-
-

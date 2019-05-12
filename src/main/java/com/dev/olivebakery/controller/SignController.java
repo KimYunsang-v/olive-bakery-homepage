@@ -6,6 +6,8 @@ import com.dev.olivebakery.service.SignService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 로그인 관련 Controller
  */
@@ -46,10 +48,17 @@ public class SignController {
         signService.delete(signInDto);
     }
 
+    // TODO
     @ApiOperation("회원정보 조회")
-    @PostMapping("/check")
-    public SignDto.MemberDto getMember(@RequestBody SignDto.SignIn signInDto){
-        return signService.getMemberInfo(signInDto);
+    @GetMapping("/userId/{userId}")
+    public SignDto.MemberDto getMember(@PathVariable String userId){
+        return signService.getMemberInfo(userId);
+    }
+
+    @ApiOperation("전체 회원정보 조회")
+    @GetMapping("/members")
+    public List<SignDto.MemberDto> getWholeMembers(){
+        return signService.getMembersInfo();
     }
 
 
