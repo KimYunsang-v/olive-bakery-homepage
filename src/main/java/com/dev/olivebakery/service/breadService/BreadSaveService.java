@@ -6,6 +6,7 @@ import com.dev.olivebakery.domain.entity.BreadImage;
 import com.dev.olivebakery.domain.entity.Days;
 import com.dev.olivebakery.domain.entity.Ingredients;
 import com.dev.olivebakery.domain.enums.DayType;
+import com.dev.olivebakery.exception.UserDefineException;
 import com.dev.olivebakery.repository.BreadImageRepository;
 import com.dev.olivebakery.repository.BreadRepository;
 import com.dev.olivebakery.repository.DaysRepository;
@@ -17,12 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -51,19 +56,24 @@ public class BreadSaveService {
         this.breadImageRepository = breadImageRepository;
     }
 
-    public void saveBread(BreadDto.BreadSave breadSave, MultipartFile image) throws IOException{
+    @Transactional
+    public Bread saveBread(BreadDto.BreadSave breadSave, MultipartFile image) throws IOException{
 
-        log.info(breadSave.getName());
+        if(breadRepository.findByName(breadSave.getName()).isPresent()){
+            throw new UserDefineException("해당 이름의 빵이 이미 존재합니다.");
+        }
 
         Bread bread = breadSaveDto2Bread(breadSave);
 
         breadRepository.save(bread);
 
-        saveIngredients(breadSave.getIngredientsList(), bread);
         saveDays(breadSave.getDayTypes(), bread);
 
-        saveImage(image, bread);
+        BreadImage breadImage = saveImage(image, bread);
 
+        breadImageRepository.save(breadImage);
+
+        return bread;
     }
 
     private Bread breadSaveDto2Bread(BreadDto.BreadSave breadSave){
@@ -72,21 +82,23 @@ public class BreadSaveService {
                 .price(breadSave.getPrice())
                 .description(breadSave.getDescription())
                 .detailDescription(breadSave.getDetailDescription())
+                .ingredientsList(getIngredientsListFromIngredientsDtoList(breadSave.getIngredientsList()))
                 .isSoldOut(false)
                 .deleteFlag(false)
                 .build();
     }
 
-    public void saveIngredients(List<BreadDto.BreadIngredient> breadIngredients, Bread bread) {
-        breadIngredients.forEach(breadIngredient -> {
-            Ingredients ingredients = Ingredients.builder()
-                    .bread(bread)
-                    .name(breadIngredient.getName())
-                    .origin(breadIngredient.getOrigin())
-                    .build();
-
-            ingredientsRepository.save(ingredients);
+    public List<Ingredients> getIngredientsListFromIngredientsDtoList(List<BreadDto.BreadIngredient> breadIngredientsList) {
+        List<Ingredients> ingredientsList = new ArrayList<>();
+        breadIngredientsList.forEach(breadIngredients -> {
+            Ingredients ingredients = ingredientsRepository.findByNameAndOrigin(breadIngredients.getName(), breadIngredients.getOrigin());
+            if(ingredients == null){
+                ingredients = ingredientsRepository.save(Ingredients.builder().name(breadIngredients.getName()).origin(breadIngredients.getOrigin()).build());
+            }
+            ingredientsList.add(ingredients);
         });
+
+        return ingredientsList;
     }
 
     public void saveDays(List<DayType> daysTypes, Bread bread){
@@ -102,25 +114,61 @@ public class BreadSaveService {
 
     public BreadImage saveImage(MultipartFile imageFile, Bread bread) throws IOException {
 
-        String fileName = imageFile.getOriginalFilename();
-        File destinationFile = new File(environment.getProperty(IMAGE_PATH_KEY)+ File.separator + fileName);
+        UUID uid = UUID.randomUUID(); // 유니크 값 생성
+
+        String fileName = uid + "_" + imageFile.getOriginalFilename();
+
+        String savePath = calcPath(environment.getProperty(IMAGE_PATH_KEY));
+
+        File destinationFile = new File(environment.getProperty(IMAGE_PATH_KEY) + savePath, fileName);
 
         imageFile.transferTo(destinationFile);
 
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/olive/bread/image/" + fileName)
+                .path("/olive/bread/image/" + bread.getName())
                 .toUriString();
 
-        BreadImage breadImage = BreadImage.builder()
+        return BreadImage.builder()
                 .imageName(imageFile.getOriginalFilename())
                 .imageSize(imageFile.getSize())
                 .imageType(imageFile.getContentType())
                 .imageUrl(imageUrl)
-                .imagePath(environment.getProperty(IMAGE_PATH_KEY) + fileName)
+                .imagePath(environment.getProperty(IMAGE_PATH_KEY) + savePath + File.separator + fileName)
                 .current(true)
                 .bread(bread)
                 .build();
+    }
 
-        return breadImageRepository.save(breadImage);
+    // 폴더 생성 함수
+    @SuppressWarnings("unused")
+    private static String calcPath(String uploadPath) {
+
+        Calendar cal = Calendar.getInstance();
+
+        String yearPath = File.separator + cal.get(Calendar.YEAR); // 연도 별 폴더 경로
+
+        String monthPath = yearPath + File.separator + new DecimalFormat("00").format(cal.get(Calendar.MONTH) + 1); // 월 별 폴더 경로
+
+        String datePath = monthPath + File.separator + new DecimalFormat("00").format(cal.get(Calendar.DATE)); // 일 별 폴더 경로
+
+        makeDir(uploadPath, yearPath, monthPath, datePath); // 폴더 생성
+
+        return datePath;
+    }
+
+    // 폴더 생성 함수
+    private static void makeDir(String uploadPath, String... paths) {
+
+        if (new File(uploadPath + paths[paths.length - 1]).exists()) {
+            return;
+        } // 해당 경로의 폴더가 존재하면 반환
+
+        for (String path : paths) {
+            File dirPath = new File(uploadPath + path);
+
+            if (!dirPath.exists()) {
+                dirPath.mkdir();
+            } // 해당 경로의 폴더 생성
+        }
     }
 }

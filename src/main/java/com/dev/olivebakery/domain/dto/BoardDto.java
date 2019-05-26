@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +19,8 @@ public class BoardDto {
     @Getter @NoArgsConstructor
     public static class GetPosts {
         private Long boardId;
-        private Timestamp insertTime;
-        private Timestamp updateTime;
+        private LocalDateTime insertTime;
+        private LocalDateTime updateTime;
         private String title;
         private String context;
         private boolean isNotice;
@@ -27,7 +28,7 @@ public class BoardDto {
         private String userId;
 
         @Builder
-        public GetPosts(Long boardId, Timestamp insertTime, Timestamp updateTime, String title, String context, boolean isNotice, boolean isSecret, String userId) {
+        public GetPosts(Long boardId, LocalDateTime insertTime, LocalDateTime updateTime, String title, String context, boolean isNotice, boolean isSecret, String userId) {
             this.boardId = boardId;
             this.insertTime = insertTime;
             this.updateTime = updateTime;

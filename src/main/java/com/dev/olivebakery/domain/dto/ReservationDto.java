@@ -185,7 +185,6 @@ public class ReservationDto {
 		}
 	}
 
-
 	@Getter
 	@NoArgsConstructor(access = AccessLevel.PROTECTED)
 	public static class ReservationUpdateRequest {

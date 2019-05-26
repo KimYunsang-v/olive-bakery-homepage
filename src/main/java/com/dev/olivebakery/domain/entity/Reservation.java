@@ -62,6 +62,15 @@ public class Reservation {
         this.reservationInfos = reservationInfos;
     }
 
+    public static Reservation of(LocalDateTime bringTime, Member member, int totalPrice) {
+        return Reservation.builder()
+                .bringTime(bringTime)
+                .member(member)
+                .price(totalPrice)
+                .build()
+        ;
+    }
+
     @Explain("요청 -> 수락 -> 완료")
     public void updateReservationType() {
         reservationType = reservationType.equals(ReservationType.REQUEST) ? ReservationType.ACCEPT : ReservationType.COMPLETE;

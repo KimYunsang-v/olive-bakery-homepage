@@ -20,7 +20,7 @@ public class Days {
     @Enumerated(value = EnumType.STRING)
     private DayType dayType;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "bread_id")
     private Bread bread;
 }

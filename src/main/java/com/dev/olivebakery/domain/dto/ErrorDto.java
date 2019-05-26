@@ -8,14 +8,14 @@ import lombok.Setter;
 @Setter
 public class ErrorDto {
 
+    private String userDefineErrorMessage;
     private String originalErrorMessage;
-    private String errorMessage;
     private String requestURL;
 
     @Builder
-    public ErrorDto(String originalErrorMessage, String errorMessage, String requestURL) {
+    public ErrorDto(String userDefineErrorMessage, String originalErrorMessage, String requestURL) {
+        this.userDefineErrorMessage = userDefineErrorMessage;
         this.originalErrorMessage = originalErrorMessage;
-        this.errorMessage = errorMessage;
         this.requestURL = requestURL;
     }
 }

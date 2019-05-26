@@ -40,7 +40,7 @@ public class TestDataCreator {
 			// Lombok @Builder support
 			Method method = clz.getDeclaredMethod("builder");
 			Object builderObj = method.invoke(null);
-			returnObj = builderObj.getClass().getDeclaredMethod("build").invoke(builderObj);
+			returnObj = builderObj.getClass().getDeclaredMethod("of").invoke(builderObj);
 		} catch (Exception e) {
 			returnObj = clz.newInstance();
 		}

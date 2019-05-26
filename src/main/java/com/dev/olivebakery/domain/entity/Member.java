@@ -1,5 +1,6 @@
 package com.dev.olivebakery.domain.entity;
 
+import com.dev.olivebakery.domain.dto.SignDto;
 import com.dev.olivebakery.domain.enums.MemberRole;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,5 +61,14 @@ public class Member {
                 , role.stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                     .collect(Collectors.toSet()));
+    }
+
+    public Member update(SignDto.SignUp dto){
+        this.email = dto.getEmail();
+        this.name = dto.getName();
+        this.pw = dto.getPw();
+        this.phoneNumber = dto.getPhoneNumber();
+        
+        return this;
     }
 }

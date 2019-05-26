@@ -5,44 +5,28 @@ import com.dev.olivebakery.domain.entity.Member;
 import com.dev.olivebakery.domain.enums.MemberRole;
 import com.dev.olivebakery.exception.UserDefineException;
 import com.dev.olivebakery.repository.MemberRepository;
-import com.dev.olivebakery.utill.TokenUtills;
+import com.dev.olivebakery.security.JwtProvider;
 import lombok.extern.java.Log;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @Log
-public class SignService implements UserDetailsService {
+public class SignService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
-    public SignService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public SignService(MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-        return new User(member.getEmail(), member.getPw(), makeGrantedAuthority(member.getRole()));
-    }
-
-    private Set<GrantedAuthority> makeGrantedAuthority(Set<MemberRole> roles) {
-        return roles.stream()
-                .map(memberRole -> new SimpleGrantedAuthority("ROLE_" + memberRole.name()))
-                .collect(Collectors.toSet());
+        this.jwtProvider = jwtProvider;
     }
 
     public String signIn(SignDto.SignIn signInDto){
@@ -53,7 +37,7 @@ public class SignService implements UserDetailsService {
             throw new UserDefineException("비밀번호를 잘못 입력하셨습니다.");
         }
 
-        return TokenUtills.createToken(member.toUser());
+        return jwtProvider.createToken(member.getEmail(), member.getRole());
     }
 
     public String signUp(SignDto.SignUp signupDto, String ROLE){
@@ -69,13 +53,14 @@ public class SignService implements UserDetailsService {
 
         memberRepository.save(member);
 
-        return TokenUtills.createToken(member.toUser());
+        return jwtProvider.createToken(member.getEmail(), member.getRole());
     }
 
     public void update(SignDto.SignUp signupDto) {
         Member member = memberRepository.findByEmail(signupDto.getEmail())
                 .orElseThrow(() -> new UserDefineException("아이디가 존재하지 않습니다."));
-        memberRepository.save(member);
+        signupDto.setPw(passwordEncoder.encode(signupDto.getPw()));
+        memberRepository.save(member.update(signupDto));
     }
 
     public void delete(SignDto.SignIn signInDto) {
@@ -92,8 +77,8 @@ public class SignService implements UserDetailsService {
                 .orElseThrow(() -> new UserDefineException("해당 유저가 존재하지 않습니다."));
     }
 
-    public SignDto.MemberDto getMemberInfo(SignDto.SignIn signInDto) {
-        Member member = memberRepository.findByEmail(signInDto.getId())
+    public SignDto.MemberDto getMemberInfo(String userId) {
+        Member member = memberRepository.findByEmail(userId)
                 .orElseThrow(() -> new UserDefineException("아이디가 존재하지 않습니다."));
         return SignDto.MemberDto.builder()
                 .email(member.getEmail())
@@ -102,5 +87,21 @@ public class SignService implements UserDetailsService {
                 .stamp(member.getStamp())
                 .build();
 
+    }
+
+    public List<SignDto.MemberDto> getMembersInfo() {
+        List<Member> members = memberRepository.findAll();
+        List<SignDto.MemberDto> memberDtos = new ArrayList<>();
+        members.forEach(member -> {
+            memberDtos.add(
+                    SignDto.MemberDto.builder()
+                            .email(member.getEmail())
+                            .name(member.getName())
+                            .phoneNumber(member.getPhoneNumber())
+                            .stamp(member.getStamp())
+                            .build()
+            );
+        });
+        return memberDtos;
     }
 }
