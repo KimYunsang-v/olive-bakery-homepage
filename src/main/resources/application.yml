@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: test
 ---
 
 spring:
@@ -56,7 +56,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
       show-sql: true
 
     database: mysql

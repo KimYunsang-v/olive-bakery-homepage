@@ -18,6 +18,8 @@ public class IngredientsService {
     public Ingredients saveIngredients(BreadDto.BreadIngredient ingredientsDto) {
         Ingredients newIngredients = Ingredients.builder().name(ingredientsDto.getName()).origin(ingredientsDto.getOrigin()).build();
 
+
+
         return ingredientsRepository.save(newIngredients);
     }
 

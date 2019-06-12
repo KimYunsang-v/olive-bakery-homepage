@@ -2,6 +2,7 @@ package com.dev.olivebakery.controller;
 
 import com.dev.olivebakery.domain.dto.BreadDto;
 import com.dev.olivebakery.domain.entity.Bread;
+import com.dev.olivebakery.domain.entity.BreadImage;
 import com.dev.olivebakery.service.breadService.BreadGetService;
 import com.dev.olivebakery.service.breadService.BreadSaveService;
 import com.dev.olivebakery.service.breadService.BreadUpdateService;
@@ -89,18 +90,28 @@ public class BreadController {
         return ResponseEntity.ok(breadUpdateService.updateBreadName(bread));
     }
 
+//    @ApiOperation("빵 정보 수정")
+//    @PutMapping()
+//    public ResponseEntity<Bread> updateBread(@RequestBody BreadDto.BreadUpdate bread){
+//        return ResponseEntity.ok(breadUpdateService.updateBread(bread));
+//    }
+
     @ApiOperation("빵 정보 수정")
     @PutMapping()
-    public ResponseEntity<Bread> updateBread(@RequestBody BreadDto.BreadUpdate bread){
-        return ResponseEntity.ok(breadUpdateService.updateBread(bread));
+    public ResponseEntity<Bread> updateBread(@RequestPart(name = "file", required = false) MultipartFile file,
+                                             @RequestParam String json) throws Exception {
+//        if(file == null){
+//            return ResponseEntity.ok(breadUpdateService.updateBread(null, json));
+//        }
+        return ResponseEntity.ok(breadUpdateService.updateBread(file, json));
     }
 
-    @ApiOperation("빵 사진 수정")
-    @PutMapping("/image")
-    public ResponseEntity<String> updateBreadIamge(@RequestPart MultipartFile file,
-                                                       @RequestParam String breadName) throws Exception{
-        return ResponseEntity.ok(breadUpdateService.updateBreadImage(file, breadName));
-    }
+//    @ApiOperation("빵 사진 수정")
+//    @PutMapping("/image")
+//    public ResponseEntity<BreadImage> updateBreadIamge(@RequestPart MultipartFile file,
+//                                                       @RequestParam String breadName) throws Exception{
+//        return ResponseEntity.ok(breadUpdateService.updateBreadImage(file, breadName));
+//    }
 
     @ApiOperation("빵 상태 변경")
     @PutMapping("/state")
@@ -128,27 +139,27 @@ public class BreadController {
                 .body(breadGetService.getImageResource(image));
     }
 
-    @ApiOperation("빵 정보에 성분 추가")
-    @PutMapping("/ingredients/add")
-    public ResponseEntity<HttpStatus> addIngredient(@RequestBody BreadDto.BreadUpdateIngredients breadUpdateIngredients){
-
-        logger.info(breadUpdateIngredients.getIngredientsList().get(0).getName());
-
-        breadUpdateService.addBreadIngredients(breadUpdateIngredients);
-
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @ApiOperation("빵 정보에 성분 삭제")
-    @DeleteMapping("/ingredients/delete")
-    public ResponseEntity<HttpStatus> deleteIngredient(@RequestBody BreadDto.BreadUpdateIngredients breadUpdateIngredients){
-
-        logger.info(breadUpdateIngredients.getIngredientsList().get(0).getName());
-
-        breadUpdateService.deleteBreadIngredients(breadUpdateIngredients);
-
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
+//    @ApiOperation("빵 정보에 성분 추가")
+//    @PutMapping("/ingredients/add")
+//    public ResponseEntity<HttpStatus> addIngredient(@RequestBody BreadDto.BreadUpdateIngredients breadUpdateIngredients){
+//
+//        logger.info(breadUpdateIngredients.getIngredientsList().get(0).getName());
+//
+//        breadUpdateService.addBreadIngredients(breadUpdateIngredients);
+//
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
+//
+//    @ApiOperation("빵 정보에 성분 삭제")
+//    @DeleteMapping("/ingredients/delete")
+//    public ResponseEntity<HttpStatus> deleteIngredient(@RequestBody BreadDto.BreadUpdateIngredients breadUpdateIngredients){
+//
+//        logger.info(breadUpdateIngredients.getIngredientsList().get(0).getName());
+//
+//        breadUpdateService.deleteBreadIngredients(breadUpdateIngredients);
+//
+//        return ResponseEntity.ok(HttpStatus.OK);
+//    }
 
 
 }

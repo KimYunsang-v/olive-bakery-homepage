@@ -54,14 +54,14 @@ public class BreadDto {
     @NoArgsConstructor
     @Builder
     @AllArgsConstructor
-    public static class BreadGetDetail{
-        private String name;
-        private int price;
-        private String detailDescription;
-        private String description;
-        private List<BreadIngredient> ingredientsList;
-        private Boolean isSoldOut;
-        private BreadState breadState;
+        public static class BreadGetDetail{
+            private String name;
+            private int price;
+            private String detailDescription;
+            private String description;
+            private List<BreadIngredient> ingredientsList;
+            private Boolean isSoldOut;
+            private BreadState breadState;
     }
 
     @Getter
@@ -93,6 +93,7 @@ public class BreadDto {
     @AllArgsConstructor
     public static class BreadUpdate {
         private String oldName;
+        private String newName;
         private int price;
         private String description;
         private String detailDescription;

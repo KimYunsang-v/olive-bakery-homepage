@@ -4,6 +4,7 @@ import com.dev.olivebakery.domain.enums.BreadState;
 import com.dev.olivebakery.domain.enums.DayType;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+import lombok.extern.java.Log;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
+@Log
 public class Bread {
 
     @Id
@@ -97,11 +99,21 @@ public class Bread {
         this.deleteFlag = delete;
     }
 
+    public void updateBreadIngredients(List<Ingredients> ingredientsList) {
+        this.ingredientsList = ingredientsList;
+    }
+
     public void addBreadIngredients(Ingredients ingredients) {
         this.ingredientsList.add(ingredients);
     }
 
-    public void deleteBreadIngredients(Ingredients ingredients){
-        this.ingredientsList.remove(ingredients);
+    public void deleteBreadIngredients(Ingredients removeIngredients){
+        this.ingredientsList.forEach(ingredients -> {
+            if(ingredients.getName().equals(removeIngredients.getName()) && ingredients.getOrigin().equals(removeIngredients.getOrigin())){
+                this.ingredientsList.remove(ingredients);
+                log.info("remove ingredients == " + ingredients.getName() + "  " + ingredients.getOrigin());
+            }
+        });
+//        this.ingredientsList.remove(ingredients);
     }
 }
