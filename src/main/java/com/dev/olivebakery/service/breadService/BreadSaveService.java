@@ -11,6 +11,7 @@ import com.dev.olivebakery.repository.BreadImageRepository;
 import com.dev.olivebakery.repository.BreadRepository;
 import com.dev.olivebakery.repository.DaysRepository;
 import com.dev.olivebakery.repository.IngredientsRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -24,14 +25,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
 @Log
+@RequiredArgsConstructor
 public class BreadSaveService {
 
     //private static final String IMAGE_PATH = "C:\\Users\\Kimyunsang\\Desktop\\spring\\imageTest\\";
@@ -44,17 +43,6 @@ public class BreadSaveService {
     private final IngredientsRepository ingredientsRepository;
     private final DaysRepository daysRepository;
     private final BreadImageRepository breadImageRepository;
-
-
-
-
-    public BreadSaveService(BreadRepository breadRepository, IngredientsRepository ingredientsRepository, DaysRepository daysRepository,
-                            BreadImageRepository breadImageRepository) {
-        this.breadRepository = breadRepository;
-        this.ingredientsRepository = ingredientsRepository;
-        this.daysRepository = daysRepository;
-        this.breadImageRepository = breadImageRepository;
-    }
 
     @Transactional
     public Bread saveBread(BreadDto.BreadSave breadSave, MultipartFile image) throws IOException{
@@ -91,10 +79,8 @@ public class BreadSaveService {
     public List<Ingredients> getIngredientsListFromIngredientsDtoList(List<BreadDto.BreadIngredient> breadIngredientsList) {
         List<Ingredients> ingredientsList = new ArrayList<>();
         breadIngredientsList.forEach(breadIngredients -> {
-            Ingredients ingredients = ingredientsRepository.findByNameAndOrigin(breadIngredients.getName(), breadIngredients.getOrigin());
-            if(ingredients == null){
-                ingredients = ingredientsRepository.save(Ingredients.builder().name(breadIngredients.getName()).origin(breadIngredients.getOrigin()).build());
-            }
+            Ingredients ingredients = Optional.ofNullable(ingredientsRepository.findByNameAndOrigin(breadIngredients.getName(), breadIngredients.getOrigin()))
+                    .orElseGet(() -> ingredientsRepository.save(Ingredients.builder().name(breadIngredients.getName()).origin(breadIngredients.getOrigin()).build()));
             ingredientsList.add(ingredients);
         });
 

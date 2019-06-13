@@ -23,13 +23,4 @@ public class Ingredients {
     private String name;
 
     private String origin;
-
-//    @ManyToMany(fetch=FetchType.LAZY, cascade={CascadeType.PERSIST,CascadeType.MERGE})
-//    @JsonBackReference
-//    @JoinTable(
-//            name = "bread_ingredients",
-//            joinColumns = @JoinColumn(name = "ingredients_id"),
-//            inverseJoinColumns = @JoinColumn(name = "bread_id")
-//    )
-//    private List<Bread> breads = new ArrayList<>();
 }

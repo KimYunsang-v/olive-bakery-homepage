@@ -2,17 +2,13 @@ package com.dev.olivebakery.controller;
 
 import com.dev.olivebakery.domain.dto.BreadDto;
 import com.dev.olivebakery.domain.entity.Bread;
-import com.dev.olivebakery.domain.entity.BreadImage;
 import com.dev.olivebakery.service.breadService.BreadGetService;
 import com.dev.olivebakery.service.breadService.BreadSaveService;
 import com.dev.olivebakery.service.breadService.BreadUpdateService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import lombok.extern.java.Log;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,36 +20,18 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/olive/bread")
 @RequiredArgsConstructor
-@Log4j2
+@Log
 public class BreadController {
 
     private final BreadSaveService breadSaveService;
     private final BreadGetService breadGetService;
     private final BreadUpdateService breadUpdateService;
 
-
-    private static final Logger logger = LoggerFactory.getLogger(BreadController.class);
-
-//    public BreadController(BreadSaveService breadSaveService, BreadGetService breadGetService,
-//                           BreadUpdateService breadUpdateService){
-//        this.breadSaveService = breadSaveService;
-//        this.breadGetService = breadGetService;
-//        this.breadUpdateService = breadUpdateService;
-//    }
-
-//    @ApiOperation("모든 빵 정보 가져오기")
-//    @GetMapping()
-//    public List<BreadDto.BreadGetAll> getAllBread(){
-//
-//        return breadGetService.getAllBread();
-//    }
-
     @ApiOperation("모든 빵 정보 가져오기")
     @GetMapping()
     public ResponseEntity<List<BreadDto.BreadGetAll>> getAllBread(){
 
         return ResponseEntity.ok(breadGetService.getAllBread());
-
     }
 
     @ApiOperation("요일별 빵 정보 가져오기")

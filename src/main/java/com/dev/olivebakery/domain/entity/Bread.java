@@ -33,9 +33,6 @@ public class Bread {
 
     private Integer price;
 
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bread", fetch = FetchType.LAZY)
-//    private List<BreadImage> breadImages;
-
     //상세정보가 아닌 간단한 소개(리스트에서 보내줄 것)
     private String description;
 
@@ -61,15 +58,6 @@ public class Bread {
 
     // 삭제 여부
     private Boolean deleteFlag;
-
-    // 무슨 요일에 파는 빵인지
-    //@ElementCollection(fetch = FetchType.EAGER)
-    //private List<Days> days = new ArrayList<>();
-
-    // 빵이 매진인지. soldout의 날짜가 오늘이면 매진
-//    @OneToOne(fetch = FetchType.EAGER,mappedBy = "bread")
-//    private SoldOut soldOut;
-
 
     public void updateName(String newName){
         this.name = newName;
@@ -111,7 +99,6 @@ public class Bread {
         this.ingredientsList.forEach(ingredients -> {
             if(ingredients.getName().equals(removeIngredients.getName()) && ingredients.getOrigin().equals(removeIngredients.getOrigin())){
                 this.ingredientsList.remove(ingredients);
-                log.info("remove ingredients == " + ingredients.getName() + "  " + ingredients.getOrigin());
             }
         });
 //        this.ingredientsList.remove(ingredients);
