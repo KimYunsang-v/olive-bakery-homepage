@@ -1,12 +1,16 @@
 package com.dev.olivebakery.service.reservationService;
 
-import com.dev.olivebakery.domain.dto.ReservationDto;
 import com.dev.olivebakery.domain.entity.Reservation;
+import com.dev.olivebakery.domain.enums.MemberRole;
 import com.dev.olivebakery.exception.UserDefineException;
 import com.dev.olivebakery.repository.ReservationRepository;
-import com.dev.olivebakery.utill.Explain;
+import com.dev.olivebakery.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.TransactionManager;
+import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * Created by YoungMan on 2019-05-21.
@@ -17,21 +21,29 @@ import org.springframework.stereotype.Service;
 public class ReservationUpdateService {
 
 	private final ReservationRepository reservationRepository;
-	private final ReservationDeleteService reservationDeleteService;
-	private final ReservationSaveService reservationSaveService;
+	private final JwtProvider jwtProvider;
 
-	@Explain("예약 정보 수정 // 삭제 후 재저장")
-	public void updateReservation(ReservationDto.ReservationUpdateRequest reservationUpdateRequest) {
-		reservationDeleteService.deleteReservation(reservationUpdateRequest.getReservationId());
-		reservationSaveService.saveReservation(reservationUpdateRequest.getReservationSaveRequest());
-	}
 
-	@Explain("예약 상태 수정")
-	public void updateReservationType(Long reservationId) {
-		Reservation reservation = reservationRepository.findById(reservationId)
-				.orElseThrow((() -> new UserDefineException("해당 예약이 존재하지 않습니다.")));
-
+	/**
+	 * 예약 상태 수정
+	 * 요청 -> 수락 -> 완료
+	 */
+	public void updateReservationType(Long reservationId, String bearerToken) {
+		checkValidateRole(bearerToken);
+		Reservation reservation = findById(reservationId);
 		reservation.updateReservationType();
 		reservationRepository.save(reservation);
+	}
+
+	private Reservation findById(Long reservationId) {
+		return reservationRepository.findById(reservationId)
+				.orElseThrow((() -> new UserDefineException("해당 예약이 존재하지 않습니다.")));
+	}
+
+	private void checkValidateRole(String bearerToken) {
+		List<MemberRole> roles = jwtProvider.getUserRolesByToken(bearerToken);
+		if(!roles.contains(MemberRole.ADMIN)) {
+			throw new UserDefineException("관리자 권한이 아닙니다");
+		}
 	}
 }

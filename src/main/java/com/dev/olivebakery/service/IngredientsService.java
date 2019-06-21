@@ -22,7 +22,7 @@ public class IngredientsService {
         Ingredients newIngredients = ingredientsBuilder(ingredientsDto);
 
         return checkIngredientsRepository(newIngredients);
-}
+    }
 
     /* 성분 여러 개 추가 */
     public List<Ingredients> saveIngredientsList(List<BreadDto.BreadIngredient> ingredientsDtoList) {

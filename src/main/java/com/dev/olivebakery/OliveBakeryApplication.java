@@ -20,7 +20,6 @@ public class OliveBakeryApplication {
     public static void main(String[] args) {
         SpringApplication.run(OliveBakeryApplication.class, args);
 
-
     }
 
 }

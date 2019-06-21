@@ -6,7 +6,6 @@ import com.dev.olivebakery.exception.UserDefineException;
 import com.dev.olivebakery.repository.ReservationRepository;
 import com.dev.olivebakery.service.SalesService;
 import com.dev.olivebakery.utill.DateUtils;
-import com.dev.olivebakery.utill.Explain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,10 @@ public class ReservationSchedulerService {
 	private final ReservationRepository reservationRepository;
 	private final SalesService salesService;
 
-	@Explain("날짜별 예약횟수, 예약 매출 조회 후 저장")
+
+	/**
+	 * 예약 완료 목록 정보 날짜별 저장
+	 */
 	@Scheduled(cron = "0 0 23 * * MON-FRI")
 	public void saveReservationSaleByDate() {
 		ReservationDto.ReservationSale reservationSale = reservationRepository.getReservationSaleByDate(ReservationType.COMPLETE,

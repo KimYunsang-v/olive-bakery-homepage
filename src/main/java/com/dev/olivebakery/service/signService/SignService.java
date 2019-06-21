@@ -1,4 +1,4 @@
-package com.dev.olivebakery.service;
+package com.dev.olivebakery.service.signService;
 
 import com.dev.olivebakery.domain.dto.SignDto;
 import com.dev.olivebakery.domain.entity.Member;
@@ -30,13 +30,16 @@ public class SignService {
     }
 
     public String signIn(SignDto.SignIn signInDto){
+
+        log.info("----login --- " + signInDto.getId() + "  " + signInDto.getPw());
+
+
         Member member = memberRepository.findByEmail(signInDto.getId())
                 .orElseThrow(() -> new UserDefineException("아이디를 잘못 입력하셨습니다."));
 
         if(!passwordEncoder.matches(signInDto.getPw(), member.getPw())){
             throw new UserDefineException("비밀번호를 잘못 입력하셨습니다.");
         }
-
         return jwtProvider.createToken(member.getEmail(), member.getRole());
     }
 
@@ -77,8 +80,8 @@ public class SignService {
                 .orElseThrow(() -> new UserDefineException("해당 유저가 존재하지 않습니다."));
     }
 
-    public SignDto.MemberDto getMemberInfo(String userId) {
-        Member member = memberRepository.findByEmail(userId)
+    public SignDto.MemberDto getMemberInfo(String bearerToken) {
+        Member member = memberRepository.findByEmail(jwtProvider.getUserEmailByToken(bearerToken))
                 .orElseThrow(() -> new UserDefineException("아이디가 존재하지 않습니다."));
         return SignDto.MemberDto.builder()
                 .email(member.getEmail())

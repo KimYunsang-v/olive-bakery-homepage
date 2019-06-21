@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class ReservationDto {
 
 	@Getter
-	@NoArgsConstructor(access = AccessLevel.PROTECTED)
+	@NoArgsConstructor
 	public static class ReservationResponse {
 
 		private Long reservationId;
@@ -160,13 +160,11 @@ public class ReservationDto {
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 		@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
 		private LocalDateTime bringTime;
-		private String userEmail;
 		private List<ReservationBread> breadInfo = new ArrayList<>();
 
 		@Builder
-		public ReservationSaveRequest(LocalDateTime bringTime, String userEmail, List<ReservationBread> breadInfo) {
+		public ReservationSaveRequest(LocalDateTime bringTime, List<ReservationBread> breadInfo) {
 			this.bringTime = bringTime;
-			this.userEmail = userEmail;
 			this.breadInfo = breadInfo;
 		}
 

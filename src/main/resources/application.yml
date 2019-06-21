@@ -42,9 +42,7 @@ logging:
 server:
   port: 8080
 
-
 ---
-
 
 spring:
   profiles: test
@@ -56,7 +54,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
       show-sql: true
 
     database: mysql

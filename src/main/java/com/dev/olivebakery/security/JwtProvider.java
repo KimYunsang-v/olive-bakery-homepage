@@ -1,27 +1,23 @@
 package com.dev.olivebakery.security;
 
 import com.dev.olivebakery.domain.enums.MemberRole;
-import com.dev.olivebakery.exception.UserDefineException;
-import com.dev.olivebakery.service.UserDetailsServiceImpl;
+import com.dev.olivebakery.service.signService.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class JwtProvider {
     private final UserDetailsServiceImpl userDetailsService;
+    private final long validityInMilliseconds = 36000000; // 테스트 중이라 10시간으로 설정.
     private String secretKey = "OLIVE";
-    private final long validityInMilliseconds = 3600000;
 
     public JwtProvider(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -61,12 +57,33 @@ public class JwtProvider {
         return null;
     }
 
-    public String getUserNameByToken(String token){
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    public String resolveToken(String bearerToken){
+        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 
     public Authentication getAuthenticationByToken(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserNameByToken(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserEmailByToken(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    // 사용자 아이디
+    public String getUserEmailByToken(String bearerToken){
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(resolveToken(bearerToken)).getBody().getSubject();
+    }
+
+    // 사용자 권한
+    public List<MemberRole> getUserRolesByToken(String bearerToken){
+        Set<MemberRole> roles = new HashSet<>();
+        List list = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(resolveToken(bearerToken)).getBody().get("roles", List.class);
+        for (Object role : list) {
+            if(String.valueOf(role).equals("CLIENT"))
+                roles.add(MemberRole.CLIENT);
+            else
+                roles.add(MemberRole.ADMIN);
+        }
+        return new ArrayList<>(roles);
     }
 }

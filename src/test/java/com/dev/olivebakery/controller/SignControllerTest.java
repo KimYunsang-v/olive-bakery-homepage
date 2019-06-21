@@ -3,21 +3,21 @@ package com.dev.olivebakery.controller;
 import com.dev.olivebakery.domain.dto.SignDto;
 import com.dev.olivebakery.domain.entity.Member;
 import com.dev.olivebakery.repository.MemberRepository;
-import com.dev.olivebakery.service.SignService;
+import com.dev.olivebakery.security.JwtProvider;
+import com.dev.olivebakery.service.signService.SignService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +30,9 @@ public class SignControllerTest {
     private MockMvc mvc;
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @MockBean
     private SignService signService;
@@ -103,5 +106,9 @@ public class SignControllerTest {
 
     @Test
     public void getWholeMembers() {
+    }
+
+    @Test
+    public void test(){
     }
 }

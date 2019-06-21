@@ -1,6 +1,7 @@
 package com.dev.olivebakery.domain.dto;
 
 
+import com.dev.olivebakery.domain.entity.Days;
 import com.dev.olivebakery.domain.enums.BreadState;
 import com.dev.olivebakery.domain.enums.DayType;
 import lombok.*;
@@ -62,6 +63,7 @@ public class BreadDto {
             private List<BreadIngredient> ingredientsList;
             private Boolean isSoldOut;
             private BreadState breadState;
+            private List<DayType> daysList;
     }
 
     @Getter
@@ -71,7 +73,6 @@ public class BreadDto {
     public static class BreadSave{
         private String name;
         private int price;
-//        private MultipartFile breadImage;
         private String description;
         private String detailDescription;
         private List<BreadIngredient> ingredientsList;
@@ -98,6 +99,7 @@ public class BreadDto {
         private String description;
         private String detailDescription;
         private List<BreadIngredient> ingredientsList;
+        private List<DayType> dayTypes;
     }
 
     @Getter

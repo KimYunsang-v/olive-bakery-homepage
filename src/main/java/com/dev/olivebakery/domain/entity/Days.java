@@ -1,6 +1,7 @@
 package com.dev.olivebakery.domain.entity;
 
 import com.dev.olivebakery.domain.enums.DayType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,5 +23,6 @@ public class Days {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "bread_id")
+    @JsonManagedReference
     private Bread bread;
 }

@@ -5,6 +5,7 @@ import com.dev.olivebakery.domain.entity.Bread;
 import com.dev.olivebakery.domain.entity.BreadImage;
 import com.dev.olivebakery.domain.entity.Days;
 import com.dev.olivebakery.domain.entity.Ingredients;
+import com.dev.olivebakery.domain.enums.BreadState;
 import com.dev.olivebakery.domain.enums.DayType;
 import com.dev.olivebakery.exception.UserDefineException;
 import com.dev.olivebakery.repository.BreadImageRepository;
@@ -44,12 +45,17 @@ public class BreadSaveService {
     private final DaysRepository daysRepository;
     private final BreadImageRepository breadImageRepository;
 
-    @Transactional
     public Bread saveBread(BreadDto.BreadSave breadSave, MultipartFile image) throws IOException{
 
-        if(breadRepository.findByName(breadSave.getName()).isPresent()){
-            throw new UserDefineException("해당 이름의 빵이 이미 존재합니다.");
-        }
+//        breadRepository.findByName(breadSave.getName())
+//                .ifPresent(bread -> {
+//                    log.info("bread ---- 존재" + bread.getName());
+//                    throw new UserDefineException("해당 이름의 빵이 이미 존재합니다.");
+//                });
+
+//        log.info("check bread name  " + checkBreadName(breadSave.getName()));
+
+        log.info("bread save ------------");
 
         Bread bread = breadSaveDto2Bread(breadSave);
 
@@ -64,6 +70,14 @@ public class BreadSaveService {
         return bread;
     }
 
+    public Boolean checkBreadName(String breadName){
+        breadRepository.findByName(breadName)
+                .ifPresent(bread -> {
+                    return;
+                });
+        return false;
+    }
+
     private Bread breadSaveDto2Bread(BreadDto.BreadSave breadSave){
         return Bread.builder()
                 .name(breadSave.getName())
@@ -71,6 +85,7 @@ public class BreadSaveService {
                 .description(breadSave.getDescription())
                 .detailDescription(breadSave.getDetailDescription())
                 .ingredientsList(getIngredientsListFromIngredientsDtoList(breadSave.getIngredientsList()))
+                .state(BreadState.NEW)
                 .isSoldOut(false)
                 .deleteFlag(false)
                 .build();

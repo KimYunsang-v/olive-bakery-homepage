@@ -6,9 +6,12 @@ import com.dev.olivebakery.domain.entity.Board;
 import com.dev.olivebakery.domain.entity.Comment;
 import com.dev.olivebakery.domain.entity.Member;
 import com.dev.olivebakery.domain.enums.BoardType;
+import com.dev.olivebakery.domain.enums.MemberRole;
 import com.dev.olivebakery.exception.UserDefineException;
 import com.dev.olivebakery.repository.BoardRepository;
 import com.dev.olivebakery.repository.CommentRepository;
+import com.dev.olivebakery.security.JwtProvider;
+import com.dev.olivebakery.service.signService.SignService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +23,13 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
     private final SignService signService;
+    private final JwtProvider jwtProvider;
 
-    public BoardService(BoardRepository boardRepository, CommentRepository commentRepository, SignService signService) {
+    public BoardService(BoardRepository boardRepository, CommentRepository commentRepository, SignService signService, JwtProvider jwtProvider) {
         this.boardRepository = boardRepository;
         this.commentRepository = commentRepository;
         this.signService = signService;
+        this.jwtProvider = jwtProvider;
     }
 
     public Board findBoardById(Long boardId) {
@@ -46,8 +51,18 @@ public class BoardService {
         return boardRepository.getNoticePosts();
     }
 
-    public BoardDto.GetPostDetails getPost(Long boardId){
-        return boardRepository.getPostDetails(boardId);
+    public BoardDto.GetPostDetails getPost(String bearerToken, Long boardId){
+        String userId = jwtProvider.getUserEmailByToken(bearerToken);//사용자 아이디 받기
+        List<MemberRole> roles = jwtProvider.getUserRolesByToken(bearerToken); //사용자 권한 받기
+
+        BoardDto.GetPostDetails postDetails = boardRepository.getPostDetails(boardId);
+        if(postDetails.getPosts().isSecret()) { // 게시물이 비밀글일 경우
+            if (postDetails.getPosts().getUserId().equals(userId) || roles.contains(MemberRole.ADMIN))
+                return postDetails; // 게시물의 작성자가 해당 열람요청자와 같거나, 관리자 권한을 가지고 있을경우 허용
+            else
+                throw new UserDefineException("해당 게시물을 열람하실 수 없습니다.");
+        }
+        return postDetails;
     }
 
     public void saveBoard(BoardDto.SavePost savePostDto) {

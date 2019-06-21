@@ -96,7 +96,7 @@ public class TestDataCreator {
 		} else if (fieldClz == Float.class || fieldClz == float.class) {
 			value = randFloat();
 		} else if (fieldClz == Long.class || fieldClz == long.class) {
-			value = randlong();
+			value = randLong();
 		} else if (fieldClz == Double.class || fieldClz == double.class) {
 			value = randDouble();
 		} else if (fieldClz == String.class) {
@@ -136,7 +136,7 @@ public class TestDataCreator {
 		return new Random().nextInt(max - min) + min;
 	}
 
-	private static long randlong() {
+	private static long randLong() {
 		return Math.abs(new Random().nextLong());
 	}
 

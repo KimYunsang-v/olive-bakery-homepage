@@ -30,7 +30,7 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
     private QMember member = QMember.member;
     private QComment comment = QComment.comment;
 
-    private int DEFAULT_LIMIT_SIZE = 10;
+    private final int DEFAULT_LIMIT_SIZE = 10;
 
     public BoardRepositoryImpl() {
         super(Board.class);
@@ -50,7 +50,7 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
                 .limit(DEFAULT_LIMIT_SIZE)
         ;
         List<BoardDto.GetPosts> boards = jpaQuery.fetch();
-        return new PageImpl<BoardDto.GetPosts>(boards, PageRequest.of(pageNum, DEFAULT_LIMIT_SIZE, new Sort(Sort.Direction.DESC, "boardId")), countResult);
+        return new PageImpl<>(boards, PageRequest.of(pageNum, DEFAULT_LIMIT_SIZE, new Sort(Sort.Direction.DESC, "boardId")), countResult);
     }
 
     @Override

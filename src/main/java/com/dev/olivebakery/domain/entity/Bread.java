@@ -29,6 +29,7 @@ public class Bread {
     @Column(name = "bread_id")
     private Long breadId;
 
+    @Column(unique = true)
     private String name;
 
     private Integer price;

@@ -137,6 +137,7 @@ public class BreadGetService {
                 .orElseThrow(() -> new UserDefineException(name + "이란 빵은 존재하지 않습니다."));
 
         List<BreadDto.BreadIngredient> breadIngredientList = ingredientList2Dto(bread.getIngredientsList());
+        List<DayType> dayTypes = daysRepository.findByBread(bread);
 
         return BreadDto.BreadGetDetail.builder()
                 .name(bread.getName())
@@ -146,6 +147,7 @@ public class BreadGetService {
                 .ingredientsList(breadIngredientList)
                 .isSoldOut(bread.getIsSoldOut())
                 .breadState(bread.getState())
+                .daysList(dayTypes)
                 .build();
     }
 
